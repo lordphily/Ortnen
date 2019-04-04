@@ -9,6 +9,15 @@ Created on Fri Mar 29 21:32:05 2019
 import csv
 import os
 
+def load_file(fname):
+    x,y=[],[]
+    with open(fname,) as f:
+        reader = csv.reader(f, delimiter=';')
+        for row in reader:
+            x.append(row[0])
+            y.append(row[1])
+    return x,y
+
 def replace_line(fname,line,new_line):
     lines = open(fname).read().splitlines()
     lines[line] = new_line
@@ -45,8 +54,17 @@ def build_latex(x):
     eingabe.append("\subsection*{Begründung}")
     eingabe.append(x[4])
     if x[10]!="":
-        eingabe.append("\subsection{Anhang}")
-        eingabe.append(x[10])
+        #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
+        eingabe.append("\subsection*{Anhang}")
+        anhang=x[10].split(",")
+        eingabe[13]=eingabe[13]+"\par \n Dieser Antrag enthält {} Anhänge:".format(len(anhang))
+        for i in range(0,len(anhang)):
+            eingabe.append("\subsection*{Anhang %s} \label{An:%s}" % (str(i+1),str(i+1)))
+            eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+            if i!=len(anhang)-1:
+                eingabe[13]=eingabe[13]+"Anhang \ \bref{An:%s}, " % (str(i+1))
+            else:
+                eingabe[13]=eingabe[13]+"Anhang \ \bref{An:%s} " % (str(i+1))    
     
     ausgabe=""
     for i in range(0,len(eingabe)):
@@ -78,12 +96,7 @@ def rename_file(fname):
     """ 
     renames the file and a existing appendix
     """
-    x,y=[],[]
-    with open(fname,) as f:
-        reader = csv.reader(f, delimiter=';')
-        for row in reader:
-            x.append(row[0])
-            y.append(row[1])
+    x,y = load_file(fname)
     date=y[0].split(".")
     if len(y[2])<20:
         title=y[2]
@@ -103,5 +116,5 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex(filelist[0])
+a=build_latex(load_file(filelist[1])[1])
 print(a)
