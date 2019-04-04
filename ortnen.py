@@ -7,6 +7,7 @@ Created on Fri Mar 29 21:32:05 2019
 """
 
 import csv
+import os
  
 def build_latex(x):
     """
@@ -48,6 +49,28 @@ def build_latex(x):
     
 x,y=[],[]
 
+def rename_file(fname):
+    """ 
+    renames the file and a existing appendix
+    """
+    x,y=[],[]
+    with open(fname,) as f:
+        reader = csv.reader(f, delimiter=';')
+        for row in reader:
+            x.append(row[0])
+            y.append(row[1])
+    date=y[0].split(".")
+    if len(y[2])<20:
+        title=y[2]
+    else:
+        title=y[2][0:20]
+    title=title.replace(" ","_")
+    
+    new_name="{}{}{}{}.csv".format(date[2],date[1],date[0],title)
+    os.rename(fname,new_name)
+    return new_name
+    
+
 with open('Beschluss02.csv',) as f:
     reader = csv.reader(f, delimiter=';')
     for row in reader:
@@ -55,5 +78,6 @@ with open('Beschluss02.csv',) as f:
         y.append(row[1])
 
 c=y[11].split(",")
+rename_file("Beschluss02.csv")
 a=build_latex(y)
 print(a)
