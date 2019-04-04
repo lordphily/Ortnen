@@ -8,6 +8,13 @@ Created on Fri Mar 29 21:32:05 2019
 
 import csv
 import os
+
+def replace_line(fname,line,new_line):
+    lines = open(fname).read().splitlines()
+    lines[line] = new_line
+    open('output_file.csv','w').write('\n'.join(lines))
+    os.remove(fname)
+    os.rename("output_file.csv",fname)
  
 def build_latex(x):
     """
@@ -47,7 +54,25 @@ def build_latex(x):
     
     return ausgabe
     
-x,y=[],[]
+def rename_appendix(appendix,fname):
+    """
+    Bennent alle Files die im appendix sind um
+    """
+    listnewname=[]
+    string=""
+    if appendix!="":
+        appendix=appendix.split(",")
+        fname=fname.split(".")[0]
+        for i in range(0,len(appendix)):
+            new_name=fname+"_Anhang"+str(i+1)+".pdf"
+            os.rename(appendix[i],new_name)
+            listnewname.append(new_name)
+        for i in range(0,len(listnewname)):
+            if i!=0:
+                string=string+","+listnewname[i]
+            else:
+                string=listnewname[i]
+    return string   
 
 def rename_file(fname):
     """ 
@@ -67,17 +92,16 @@ def rename_file(fname):
     title=title.replace(" ","_")
     
     new_name="{}{}{}{}.csv".format(date[2],date[1],date[0],title)
+    new_appendix=rename_appendix(y[10],new_name)
     os.rename(fname,new_name)
+    replace_line(new_name,10,'Anhang;"{}"'.format(new_appendix))
     return new_name
     
+filelist=[]
+for filename in os.listdir():
+    if filename.endswith(".csv"):
+        rename_file(filename)
+        filelist.append(filename)
 
-with open('Beschluss02.csv',) as f:
-    reader = csv.reader(f, delimiter=';')
-    for row in reader:
-        x.append(row[0])
-        y.append(row[1])
-
-c=y[11].split(",")
-rename_file("Beschluss02.csv")
-a=build_latex(y)
+a=build_latex(filelist[0])
 print(a)
