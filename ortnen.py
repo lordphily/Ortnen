@@ -49,22 +49,24 @@ def build_latex(x):
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
     eingabe.append("\end{tabularx}")
-    eingabe.append("\subsection*{Antragstext}")
+    eingabe.append("\subsection*{Antrags/Beschlusstext}")
     eingabe.append(x[3])
     eingabe.append("\subsection*{Begründung}")
     eingabe.append(x[4])
     if x[10]!="":
         #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
-        eingabe.append("\subsection*{Anhang}")
+        eingabe.append("\ \bappendix")
+        eingabe.append("\section*{Anhang}")
         anhang=x[10].split(",")
-        eingabe[13]=eingabe[13]+"\par \n Dieser Antrag enthält {} Anhänge:".format(len(anhang))
+        bennenung=x[11].split(",")
+        eingabe[14]=eingabe[14]+"\par \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
         for i in range(0,len(anhang)):
-            eingabe.append("\subsection*{Anhang %s} \label{An:%s}" % (str(i+1),str(i+1)))
+            eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
             eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
             if i!=len(anhang)-1:
-                eingabe[13]=eingabe[13]+"Anhang \ \bref{An:%s}, " % (str(i+1))
+                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s}, " % (str(i+1))
             else:
-                eingabe[13]=eingabe[13]+"Anhang \ \bref{An:%s} " % (str(i+1))    
+                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))    
     
     ausgabe=""
     for i in range(0,len(eingabe)):
@@ -116,5 +118,5 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex(load_file(filelist[1])[1])
+a=build_latex(load_file(filelist[0])[1])
 print(a)
