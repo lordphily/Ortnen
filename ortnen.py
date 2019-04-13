@@ -24,6 +24,74 @@ def replace_line(fname,line,new_line):
     open('output_file.csv','w').write('\n'.join(lines))
     os.remove(fname)
     os.rename("output_file.csv",fname)
+
+def build_latex_standalone(x):
+    """
+    Mache aus x ein latex bereich des dokuments
+    
+    """
+    eingabe=[]
+    eingabe.append("\ \btitle{%s}" %(x[2]))
+    eingabe.append("\ \bauthor{%s}" %(x[1]))
+    eingabe.append("\ \bdate{%s}" %(x[0]))
+    eingabe.append("\maketitle") 
+    eingabe.append("\section{Infos}")
+    eingabe.append("\ \bbegin{tabularx}{\linewidth}{lX}")
+    eingabe.append(r"\textbf{Anatrag/Beschluss wurde} & %s\\" %(x[9]))
+    x[11]=x[11].replace(" ","")
+    kw=x[11].split(",")
+    for i in range(0,len(kw)):
+        if i==0:
+            eingabe.append(r"\textbf{Keyword:} & %s\\" %(kw[i]))
+        else:
+            eingabe.append(r" & %s\\" %(kw[i]))
+    eingabe.append("\end{tabularx}")
+    eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+    eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+    eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
+    eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
+    eingabe.append("\end{tabularx}")
+    eingabe.append("\section{Antrags/Beschlusstext}")
+    eingabe.append(x[3])
+    eingabe.append("\section{Begründung}")
+    eingabe.append(x[4])
+    if x[23]=="Ja" and x[24]!="":
+        eingabe.append("\section{Änderungsanträge}")
+        delta=7
+        for i in range(0,int((len(x)-23)/delta)):
+            eingabe.append("\subsection{Änderungsvorschlag %s}" %(i))
+            eingabe.append("\subsection*{Vorschlag}")
+            eingabe.append(x[24+(delta*i)])
+            eingabe.append("\subsection*{Begründung}")
+            eingabe.append(x[25+(delta*i)]+"\\\\")
+            eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+            eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+            eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
+            eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
+            eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29+(delta*i)]))
+            eingabe.append("\end{tabularx}")
+    if x[10]!="":
+        #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
+        eingabe.append("\ \bappendix")
+        eingabe.append("\section*{Anhang}")
+        anhang=x[10].split(",")
+        bennenung=x[11].split(",")
+        eingabe[14]=eingabe[14]+"\par \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
+        for i in range(0,len(anhang)):
+            eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
+            eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+            if i!=len(anhang)-1:
+                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s}, " % (str(i+1))
+            else:
+                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))
+                
+
+    
+    ausgabe=""
+    for i in range(0,len(eingabe)):
+        ausgabe=ausgabe+eingabe[i]+"\n"
+    
+    return ausgabe
  
 def build_latex(x):
     """
@@ -53,6 +121,20 @@ def build_latex(x):
     eingabe.append(x[3])
     eingabe.append("\subsection*{Begründung}")
     eingabe.append(x[4])
+    if x[23]=="Ja" and x[24]!="":
+        eingabe.append("\section*{Änderungsanträge}")
+        delta=7
+        for i in range(0,int((len(x)-23)/delta)):
+            eingabe.append("\subsection*{Vorschlag}")
+            eingabe.append(x[24+(delta*i)])
+            eingabe.append("\subsection*{Begründung}")
+            eingabe.append(x[25+(delta*i)]+"\\\\")
+            eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+            eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+            eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
+            eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
+            eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29+(delta*i)]))
+            eingabe.append("\end{tabularx}")
     if x[10]!="":
         #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
         eingabe.append("\ \bappendix")
@@ -66,7 +148,9 @@ def build_latex(x):
             if i!=len(anhang)-1:
                 eingabe[14]=eingabe[14]+"\ \bnameref{An:%s}, " % (str(i+1))
             else:
-                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))    
+                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))
+                
+
     
     ausgabe=""
     for i in range(0,len(eingabe)):
@@ -118,5 +202,5 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex(load_file(filelist[0])[1])
+a=build_latex_standalone(load_file(filelist[0])[1])
 print(a)
