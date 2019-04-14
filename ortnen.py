@@ -63,20 +63,30 @@ def build_latex_standalone(x):
         anzahl=int((len(x)-23)/delta)
         if anzahl>1:
             eingabe.append("\section{Änderungsanträge}")
-        else:
-            eingabe.append("\section{Änderungsantrag}")
-        for i in range(0,anzahl):
-            eingabe.append("\subsection{Änderungsvorschlag %s}" %(i+1))
-            eingabe.append("\subsubsection*{Vorschlag}")
-            eingabe.append(x[24+(delta*i)])
-            eingabe.append("\subsubsection*{Begründung}")
-            eingabe.append(x[25+(delta*i)]+"\\vspace{1.5ex} \\\\")
+            eingabe.append("\subsection*{Vorschlag}")
+            eingabe.append(x[24])
+            eingabe.append("\subsection*{Begründung}")
+            eingabe.append(x[25]+"\\vspace{1.5ex} \\\\")
             eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
             eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
             eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
-            eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
-            eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29+(delta*i)]))
+            eingabe.append(r"{} & {} & {} \\".format(x[26],x[27],x[28]))
+            eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29]))
             eingabe.append("\end{tabularx}")
+        else:
+            eingabe.append("\section{Änderungsantrag}")
+            for i in range(0,anzahl):
+                eingabe.append("\subsection{Änderungsvorschlag %s}" %(i+1))
+                eingabe.append("\subsubsection*{Vorschlag}")
+                eingabe.append(x[24+(delta*i)])
+                eingabe.append("\subsubsection*{Begründung}")
+                eingabe.append(x[25+(delta*i)]+"\\vspace{1.5ex} \\\\")
+                eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
+                eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+                eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
+                eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
+                eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29+(delta*i)]))
+                eingabe.append("\end{tabularx}")
     if x[10]!="":
         #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
         eingabe.append("\\appendix")
@@ -86,7 +96,7 @@ def build_latex_standalone(x):
         eingabe[14]=eingabe[14]+"\\vspace{1.5ex} \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
-            eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+            eingabe.append("%%\includepdf[pages=-]{%s}" %(anhang[i]))
             if i!=len(anhang)-1:
                 eingabe[14]=eingabe[14]+"\\nameref{An:%s}, " % (str(i+1))
             else:
@@ -151,7 +161,7 @@ def build_latex(x):
         eingabe[14]=eingabe[14]+"\par \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
-            eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+            eingabe.append("%\includepdf[pages=-]{%s}" %(anhang[i]))
             if i!=len(anhang)-1:
                 eingabe[14]=eingabe[14]+"\\nameref{An:%s}, " % (str(i+1))
             else:
@@ -212,5 +222,6 @@ for filename in os.listdir():
 a=build_latex_standalone(load_file(filelist[0])[1])
 pre=open("preamble.txt").read()
 doc=pre+a+"\n\\end{document}"
-write_file("aut.txt",doc)
+os.chdir("Ausgabe")
+write_file("aut.tex",doc)
 print(a)
