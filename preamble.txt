@@ -1,0 +1,7 @@
+\documentclass[12pt,a4paper,draft]{scrartcl}
+\usepackage{hyperref}
+\usepackage{pdfpages}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{nameref}
+\begin{document}

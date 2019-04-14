@@ -24,6 +24,9 @@ def replace_line(fname,line,new_line):
     open('output_file.csv','w').write('\n'.join(lines))
     os.remove(fname)
     os.rename("output_file.csv",fname)
+    
+def write_file(fname,s):
+    open(fname,"w").write(s)
 
 def build_latex_standalone(x):
     """
@@ -31,12 +34,12 @@ def build_latex_standalone(x):
     
     """
     eingabe=[]
-    eingabe.append("\ \btitle{%s}" %(x[2]))
-    eingabe.append("\ \bauthor{%s}" %(x[1]))
-    eingabe.append("\ \bdate{%s}" %(x[0]))
+    eingabe.append("\\title{%s}" %(x[2]))
+    eingabe.append("\\author{%s}" %(x[1]))
+    eingabe.append("\\date{%s}" %(x[0]))
     eingabe.append("\maketitle") 
     eingabe.append("\section{Infos}")
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}lX}")
+    eingabe.append("\\begin{tabularx}{\linewidth}{@{}lX}")
     eingabe.append(r"\textbf{Anatrag/Beschluss wurde} & %s\\" %(x[9]))
     x[11]=x[11].replace(" ","")
     kw=x[11].split(",")
@@ -46,7 +49,7 @@ def build_latex_standalone(x):
         else:
             eingabe.append(r" & %s\\" %(kw[i]))
     eingabe.append("\end{tabularx}")
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}XXX}")
+    eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
     eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
@@ -68,7 +71,7 @@ def build_latex_standalone(x):
             eingabe.append(x[24+(delta*i)])
             eingabe.append("\subsubsection*{Begründung}")
             eingabe.append(x[25+(delta*i)]+"\\vspace{1.5ex} \\\\")
-            eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}XXX}")
+            eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
             eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
             eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
             eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
@@ -76,18 +79,18 @@ def build_latex_standalone(x):
             eingabe.append("\end{tabularx}")
     if x[10]!="":
         #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
-        eingabe.append("\ \bappendix")
+        eingabe.append("\\appendix")
         eingabe.append("\section*{Anhang}")
         anhang=x[10].split(",")
         bennenung=x[11].split(",")
-        eingabe[14]=eingabe[14]+"\vspace{1.5ex} \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
+        eingabe[14]=eingabe[14]+"\\vspace{1.5ex} \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
             eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
             if i!=len(anhang)-1:
-                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s}, " % (str(i+1))
+                eingabe[14]=eingabe[14]+"\\nameref{An:%s}, " % (str(i+1))
             else:
-                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))
+                eingabe[14]=eingabe[14]+"\\nameref{An:%s} " % (str(i+1))
                 
 
     
@@ -104,7 +107,7 @@ def build_latex(x):
     """
     eingabe=[]
     eingabe.append("\section{%s}" %(x[2]))
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{lX}")
+    eingabe.append("\\begin{tabularx}{\linewidth}{lX}")
     eingabe.append(r"\textbf{Abstimmendes Gremium:} & %s\\" %(x[1]))
     eingabe.append(r"\textbf{Datum:} & %s\\" %(x[0]))
     eingabe.append(r"\textbf{Anatrag/Beschluss wurde} & %s\\" %(x[9]))
@@ -116,7 +119,7 @@ def build_latex(x):
         else:
             eingabe.append(r" & %s\\" %(kw[i]))
     eingabe.append("\end{tabularx}")
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+    eingabe.append("\\begin{tabularx}{\linewidth}{XXX}")
     eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
@@ -133,7 +136,7 @@ def build_latex(x):
             eingabe.append(x[24+(delta*i)])
             eingabe.append("\subsection*{Begründung}")
             eingabe.append(x[25+(delta*i)]+"\\\\")
-            eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+            eingabe.append("\\begin{tabularx}{\linewidth}{XXX}")
             eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
             eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
             eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
@@ -141,7 +144,7 @@ def build_latex(x):
             eingabe.append("\end{tabularx}")
     if x[10]!="":
         #\includepdf[pages=-]{Anhang/Geschaeftsordnung_Jugendausschuss.pdf}
-        eingabe.append("\ \bappendix")
+        eingabe.append("\\appendix")
         eingabe.append("\section*{Anhang}")
         anhang=x[10].split(",")
         bennenung=x[11].split(",")
@@ -150,9 +153,9 @@ def build_latex(x):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
             eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
             if i!=len(anhang)-1:
-                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s}, " % (str(i+1))
+                eingabe[14]=eingabe[14]+"\\nameref{An:%s}, " % (str(i+1))
             else:
-                eingabe[14]=eingabe[14]+"\ \bnameref{An:%s} " % (str(i+1))
+                eingabe[14]=eingabe[14]+"\\nameref{An:%s} " % (str(i+1))
                 
 
     
@@ -207,4 +210,7 @@ for filename in os.listdir():
         filelist.append(filename)
 
 a=build_latex_standalone(load_file(filelist[0])[1])
+pre=open("preamble.txt").read()
+doc=pre+a+"\n\\end{document}"
+write_file("aut.txt",doc)
 print(a)
