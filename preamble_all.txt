@@ -5,3 +5,8 @@
 \usepackage{graphicx}
 \usepackage{nameref}
 \begin{document}
+\title{Beschlüsse und Anträge der Jugend des Sächsischen Bersteigerbundes(JSBB)}
+\author{JSBB}
+\date{\today}
+\maketitle
+\tableofcontents
