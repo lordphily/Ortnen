@@ -25,8 +25,6 @@ def replace_line(fname,line,new_line):
     os.remove(fname)
     os.rename("output_file.csv",fname)
     
-def write_file(fname,s):
-    open(fname,"w").write(s)
 
 def build_latex_standalone(x):
     """
@@ -50,7 +48,7 @@ def build_latex_standalone(x):
             eingabe.append(r" & %s\\" %(kw[i]))
     eingabe.append("\end{tabularx}")
     eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
-    eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+    eingabe.append(r"\textbf{Abstimmungsergebniss:}&&\\")
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
     eingabe.append("\end{tabularx}")
@@ -61,20 +59,20 @@ def build_latex_standalone(x):
     if x[23]=="Ja" and x[24]!="":
         delta=7
         anzahl=int((len(x)-23)/delta)
-        if anzahl>1:
-            eingabe.append("\section{Änderungsanträge}")
+        if anzahl==1:
+            eingabe.append("\section{Änderungsantrag}")
             eingabe.append("\subsection*{Vorschlag}")
             eingabe.append(x[24])
             eingabe.append("\subsection*{Begründung}")
             eingabe.append(x[25]+"\\vspace{1.5ex} \\\\")
             eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
-            eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+            eingabe.append(r"\textbf{Abstimmungsergebniss:}&&\\")
             eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
             eingabe.append(r"{} & {} & {} \\".format(x[26],x[27],x[28]))
             eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29]))
             eingabe.append("\end{tabularx}")
         else:
-            eingabe.append("\section{Änderungsantrag}")
+            eingabe.append("\section{Änderungsanträge}")
             for i in range(0,anzahl):
                 eingabe.append("\subsection{Änderungsvorschlag %s}" %(i+1))
                 eingabe.append("\subsubsection*{Vorschlag}")
@@ -82,7 +80,7 @@ def build_latex_standalone(x):
                 eingabe.append("\subsubsection*{Begründung}")
                 eingabe.append(x[25+(delta*i)]+"\\vspace{1.5ex} \\\\")
                 eingabe.append("\\begin{tabularx}{\linewidth}{@{}XXX}")
-                eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+                eingabe.append(r"\textbf{Abstimmungsergebniss:}&&\\")
                 eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
                 eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
                 eingabe.append(r"\multicolumn{2}{l}{\textbf{Änderungsantrag wurde:}} & %s \\" %(x[29+(delta*i)]))
@@ -109,6 +107,17 @@ def build_latex_standalone(x):
         ausgabe=ausgabe+eingabe[i]+"\n"
     
     return ausgabe
+
+def write_laxtx_standalone(fname):
+    a=build_latex_standalone(load_file(fname)[1])
+    pre=open("preamble.txt").read()
+    doc=pre+a+"\n\\end{document}"
+    path=os.getcwd()
+    os.chdir("Ausgabe")
+    fname_write=fname.split(".")[0]
+    fname_write=fname_write+".tex"
+    open(fname_write,"w").write(doc)
+    os.chdir(path)
  
 def build_latex(x):
     """
@@ -130,7 +139,7 @@ def build_latex(x):
             eingabe.append(r" & %s\\" %(kw[i]))
     eingabe.append("\end{tabularx}")
     eingabe.append("\\begin{tabularx}{\linewidth}{XXX}")
-    eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
+    eingabe.append(r"\\textbf{Abstimmungsergebniss:}&&\\")
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
     eingabe.append("\end{tabularx}")
@@ -219,9 +228,6 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex_standalone(load_file(filelist[0])[1])
-pre=open("preamble.txt").read()
-doc=pre+a+"\n\\end{document}"
-os.chdir("Ausgabe")
-write_file("aut.tex",doc)
+a=build_latex_standalone(load_file(filelist[1])[1])
+write_laxtx_standalone(filelist[0])
 print(a)
