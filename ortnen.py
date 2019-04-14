@@ -36,7 +36,7 @@ def build_latex_standalone(x):
     eingabe.append("\ \bdate{%s}" %(x[0]))
     eingabe.append("\maketitle") 
     eingabe.append("\section{Infos}")
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{lX}")
+    eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}lX}")
     eingabe.append(r"\textbf{Anatrag/Beschluss wurde} & %s\\" %(x[9]))
     x[11]=x[11].replace(" ","")
     kw=x[11].split(",")
@@ -46,7 +46,7 @@ def build_latex_standalone(x):
         else:
             eingabe.append(r" & %s\\" %(kw[i]))
     eingabe.append("\end{tabularx}")
-    eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+    eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}XXX}")
     eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
     eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
     eingabe.append(r"{} & {} & {} \\".format(x[6],x[7],x[8]))
@@ -56,15 +56,19 @@ def build_latex_standalone(x):
     eingabe.append("\section{Begründung}")
     eingabe.append(x[4])
     if x[23]=="Ja" and x[24]!="":
-        eingabe.append("\section{Änderungsanträge}")
         delta=7
-        for i in range(0,int((len(x)-23)/delta)):
-            eingabe.append("\subsection{Änderungsvorschlag %s}" %(i))
-            eingabe.append("\subsection*{Vorschlag}")
+        anzahl=int((len(x)-23)/delta)
+        if anzahl>1:
+            eingabe.append("\section{Änderungsanträge}")
+        else:
+            eingabe.append("\section{Änderungsantrag}")
+        for i in range(0,anzahl):
+            eingabe.append("\subsection{Änderungsvorschlag %s}" %(i+1))
+            eingabe.append("\subsubsection*{Vorschlag}")
             eingabe.append(x[24+(delta*i)])
-            eingabe.append("\subsection*{Begründung}")
-            eingabe.append(x[25+(delta*i)]+"\\\\")
-            eingabe.append("\ \bbegin{tabularx}{\linewidth}{XXX}")
+            eingabe.append("\subsubsection*{Begründung}")
+            eingabe.append(x[25+(delta*i)]+"\\vspace{1.5ex} \\\\")
+            eingabe.append("\ \bbegin{tabularx}{\linewidth}{@{}XXX}")
             eingabe.append(r"\multicolumn{3}{l}{\textbf{Abstimmungsergebniss:}}\\")
             eingabe.append(r"Zustimmung & Ablehnung & Enthaltungen \\")
             eingabe.append(r"{} & {} & {} \\".format(x[26+(delta*i)],x[27+(delta*i)],x[28+(delta*i)]))
@@ -76,7 +80,7 @@ def build_latex_standalone(x):
         eingabe.append("\section*{Anhang}")
         anhang=x[10].split(",")
         bennenung=x[11].split(",")
-        eingabe[14]=eingabe[14]+"\par \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
+        eingabe[14]=eingabe[14]+"\vspace{1.5ex} \n Dieser Antrag enthält {} Anhänge: ".format(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
             eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
