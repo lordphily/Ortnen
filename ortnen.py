@@ -8,6 +8,7 @@ Created on Fri Mar 29 21:32:05 2019
 
 import csv
 import os
+import shutil 
 
 def load_file(fname):
     x,y=[],[]
@@ -32,6 +33,7 @@ def build_latex_standalone(x):
     
     """
     eingabe=[]
+    anhaenge_file=[]
     eingabe.append("\\title{%s}" %(x[2]))
     eingabe.append("\\author{%s}" %(x[1]))
     eingabe.append("\\date{%s}" %(x[0]))
@@ -94,7 +96,8 @@ def build_latex_standalone(x):
         eingabe[14]=eingabe[14]+"\\vspace{1.5ex} \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
-            eingabe.append("%%\includepdf[pages=-]{%s}" %(anhang[i]))
+            eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+            anhaenge_file.append(anhang[i])
             if i!=len(anhang)-1:
                 eingabe[14]=eingabe[14]+"\\nameref{An:%s}, " % (str(i+1))
             else:
@@ -106,10 +109,12 @@ def build_latex_standalone(x):
     for i in range(0,len(eingabe)):
         ausgabe=ausgabe+eingabe[i]+"\n"
     
-    return ausgabe
+    return ausgabe,anhaenge_file
 
 def write_latex_standalone(fname):
-    a=build_latex_standalone(load_file(fname)[1])
+    a,b=build_latex_standalone(load_file(fname)[1])
+    for i in b:
+        shutil.copy2(i, "Ausgabe")
     pre=open("preamble.txt").read()
     doc=pre+a+"\n\\end{document}"
     path=os.getcwd()
@@ -127,6 +132,7 @@ def build_latex(file_list):
     eingabe=[]
     anhang_count=0
     anhaenge=[]
+    anhaenge_file=[]
     for file in file_list:
         x=load_file(file)[1]
         eingabe.append("\section{%s}"  %(x[2]))
@@ -189,7 +195,8 @@ def build_latex(file_list):
             for i in range(0,len(anhang)):
                 anhang_count=anhang_count+1
                 anhaenge.append("\subsection*{%s - %s} \label{An:%s}" % (x[2],bennenung[i],str(anhang_count)))
-                anhaenge.append("%%\includepdf[pages=-]{%s}" %(anhang[i]))
+                anhaenge.append("\includepdf[pages=-]{%s}" %(anhang[i]))
+                anhaenge_file.append(anhang[i])
                 if i!=len(anhang)-1:
                     eingabe[line_text]=eingabe[line_text]+"\\nameref{An:%s}, " % (str(anhang_count))
                 else:
@@ -204,10 +211,12 @@ def build_latex(file_list):
     for i in range(0,len(anhaenge)):
         ausgabe=ausgabe+anhaenge[i]+"\n"
         
-    return ausgabe
+    return ausgabe,anhaenge_file
 
 def write_latex_all(filelist):
-    a=build_latex(filelist)
+    a,b=build_latex(filelist)
+    for i in b:
+        shutil.copy2(i, "Ausgabe")
     pre=open("preamble_all.txt").read()
     doc=pre+a+"\n\\end{document}"
     path=os.getcwd()
@@ -260,8 +269,8 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex_standalone(load_file(filelist[1])[1])
+a=build_latex_standalone(load_file(filelist[1])[1])[0]
 write_latex_standalone(filelist[0])
-a=build_latex(filelist)
+a=build_latex(filelist)[0]
 write_latex_all(filelist)
 print(a)
