@@ -93,7 +93,7 @@ def build_latex_standalone(x):
         eingabe.append("\section*{Anhang}")
         anhang=x[10].split(",")
         bennenung=x[11].split(",")
-        eingabe[14]=eingabe[14]+"\\vspace{1.5ex} \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
+        eingabe[14]=eingabe[14]+"\\\\ \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
         for i in range(0,len(anhang)):
             eingabe.append("\subsection*{%s} \label{An:%s}" % (bennenung[i],str(i+1)))
             eingabe.append("\includepdf[pages=-]{%s}" %(anhang[i]))
@@ -191,10 +191,10 @@ def build_latex(file_list):
         if x[10]!="":
             anhang=x[10].split(",")
             bennenung=x[11].split(",")
-            eingabe[line_text]=eingabe[line_text]+"\\vspace{1.5ex} \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
+            eingabe[line_text]=eingabe[line_text]+"\\\\ \n Dieser Antrag enthält %s Anhänge: " %(len(anhang))
             for i in range(0,len(anhang)):
                 anhang_count=anhang_count+1
-                anhaenge.append("\subsection*{%s - %s} \label{An:%s}" % (x[2],bennenung[i],str(anhang_count)))
+                anhaenge.append("\section{%s - %s} \label{An:%s}" % (x[2],bennenung[i],str(anhang_count)))
                 anhaenge.append("\includepdf[pages=-]{%s}" %(anhang[i]))
                 anhaenge_file.append(anhang[i])
                 if i!=len(anhang)-1:
@@ -202,8 +202,9 @@ def build_latex(file_list):
                 else:
                     eingabe[line_text]=eingabe[line_text]+"\\nameref{An:%s} " % (str(anhang_count))   
     
+    eingabe.append("\\newpage") 
     eingabe.append("\\appendix") 
-    eingabe.append("\section*{Anhang}")         
+    eingabe.append("\\pagenumbering{Roman}")        
     ausgabe=""
     for i in range(0,len(eingabe)):
         ausgabe=ausgabe+eingabe[i]+"\n"
@@ -273,4 +274,5 @@ a=build_latex_standalone(load_file(filelist[1])[1])[0]
 write_latex_standalone(filelist[0])
 a=build_latex(filelist)[0]
 write_latex_all(filelist)
+#subprocess.call('pdflatex temp')
 print(a)
