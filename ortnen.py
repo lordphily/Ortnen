@@ -9,6 +9,7 @@ Created on Fri Mar 29 21:32:05 2019
 import csv
 import os
 import shutil 
+import subprocess
 
 def load_file(fname):
     x,y=[],[]
@@ -274,5 +275,9 @@ a=build_latex_standalone(load_file(filelist[1])[1])[0]
 write_latex_standalone(filelist[0])
 a=build_latex(filelist)[0]
 write_latex_all(filelist)
-#subprocess.call('pdflatex temp')
+path=os.getcwd()
+os.chdir("Ausgabe")
+subprocess.call('pdflatex Alles.tex', shell=True)
+subprocess.call('pdflatex Alles.tex', shell=True)
+os.chdir(path)
 print(a)
