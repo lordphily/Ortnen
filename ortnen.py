@@ -264,6 +264,36 @@ def rename_file(fname):
     os.rename(fname,new_name)
     replace_line(new_name,10,'Anhang;"{}"'.format(new_appendix))
     return new_name
+
+def make_html_table(filelist):
+    """
+    built the html table and
+    """
+    pre=open("HTML_Header.txt").read()
+    out=[]
+    for file in filelist:
+        x=load_file(file)[1]
+        out.append("<tr>")
+        out.append("<th>{}</th>".format(x[0]))
+        out.append("<th>{}</th>".format(x[2]))
+        out.append("<th>{}</th>".format(x[1]))
+        out.append("<th>{}</th>".format(x[6]))
+        out.append("<th>{}</th>".format(x[7]))
+        out.append("<th>{}</th>".format(x[8]))
+        out.append("<th>{}</th>".format(x[9]))
+        out.append("<th>{}</th>".format(x[12]))
+        out.append("<th>link</th>")
+        out.append("</tr>")
+    out.append("</table>")
+        
+    for i in range(0,len(out)):
+        pre=pre+out[i]+"\n"
+    
+    path=os.getcwd()
+    os.chdir("Ausgabe")
+    open("table.html","w").write(pre)
+    os.chdir(path)
+
     
 filelist=[]
 for filename in os.listdir():
@@ -271,13 +301,14 @@ for filename in os.listdir():
         rename_file(filename)
         filelist.append(filename)
 
-a=build_latex_standalone(load_file(filelist[1])[1])[0]
-write_latex_standalone(filelist[0])
-a=build_latex(filelist)[0]
-write_latex_all(filelist)
+a=make_html_table(filelist)
+#a=build_latex_standalone(load_file(filelist[1])[1])[0]
+#write_latex_standalone(filelist[0])
+#a=build_latex(filelist)[0]
+#write_latex_all(filelist)
 path=os.getcwd()
-os.chdir("Ausgabe")
-subprocess.call('pdflatex Alles.tex', shell=True)
-subprocess.call('pdflatex Alles.tex', shell=True)
+#os.chdir("Ausgabe")
+#subprocess.call('pdflatex Alles.tex', shell=True)
+#subprocess.call('pdflatex Alles.tex', shell=True)
 os.chdir(path)
 print(a)
